@@ -34,7 +34,7 @@ class DSCkeybushome : public PollingComponent, public CustomAPIDevice {
   std::function<void (uint8_t,std::string)> partitionMsgChangeCallback;    
   
 
-  const std::string STATUS_PENDING = "pending";
+  const std::string STATUS_ARMING = "arming";
   const std::string STATUS_ARM = "armed_away";
   const std::string STATUS_STAY = "armed_home";
   const std::string STATUS_NIGHT = "armed_night";
@@ -283,7 +283,7 @@ bool isInt(std::string s, int base){
 			// Publishes exit delay status
 			if (dsc.exitDelayChanged[partition] ) {
 				dsc.exitDelayChanged[partition] = false;  // Resets the exit delay status flag
-				if (dsc.exitDelay[partition]) partitionStatusChangeCallback(partition+1,STATUS_PENDING );  
+				if (dsc.exitDelay[partition]) partitionStatusChangeCallback(partition+1,STATUS_ARMING );
 				else if (!dsc.exitDelay[partition] && !dsc.armed[partition]) partitionStatusChangeCallback(partition+1,STATUS_OFF );
 			}
 			
