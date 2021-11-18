@@ -15,17 +15,18 @@ esphome:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  use_address: dscalarm
 
   ap:
     ssid: "$systemName"
     password: !secret wifi_password
 
 logger:
-  baud_rate: 0
-  level: info
+#  baud_rate: 0
+  level: debug
 
 api:
-   password: !secret api_password  
+#   password: !secret api_password
       
    
 ota:
@@ -51,13 +52,11 @@ custom_component:
     DSCkeybus->onPartitionStatusChange([&](uint8_t partition,std::string statusCode) {
        switch(partition) {
          case 1: id(p1).publish_state(statusCode); break;
-         case 2: id(p2).publish_state(statusCode); break;
       }
     });
     DSCkeybus->onPartitionMsgChange([&](uint8_t partition,std::string msg) {
        switch(partition) {
          case 1: id(m1).publish_state(msg); break;
-         case 2: id(m2).publish_state(msg); break;
       }
     });
     DSCkeybus->onTroubleStatusChange([&](troubleStatus ts,bool open) {
@@ -79,14 +78,23 @@ custom_component:
         case 1: id(z1).publish_state(open); break;
         case 2: id(z2).publish_state(open); break;
         case 3: id(z3).publish_state(open); break;
-        case 4: id(z4).publish_state(open); break;
         case 5: id(z5).publish_state(open); break;
         case 6: id(z6).publish_state(open); break;
         case 7: id(z7).publish_state(open); break;
         case 8: id(z8).publish_state(open); break;
-        case 9: id(z9).publish_state(open); break;
-        case 10: id(z10).publish_state(open); break;
-        case 11: id(z11).publish_state(open); break;
+        case 17: id(z17).publish_state(open); break;
+        case 41: id(z41).publish_state(open); break;
+        case 42: id(z42).publish_state(open); break;
+        case 43: id(z43).publish_state(open); break;
+        case 44: id(z44).publish_state(open); break;
+        case 45: id(z45).publish_state(open); break;
+        case 46: id(z46).publish_state(open); break;
+        case 49: id(z49).publish_state(open); break;
+        case 50: id(z50).publish_state(open); break;
+        case 51: id(z51).publish_state(open); break;
+        case 52: id(z52).publish_state(open); break;
+        case 53: id(z53).publish_state(open); break;
+        case 54: id(z54).publish_state(open); break;
       }
     });
     DSCkeybus->onZoneAlarmChange([&](uint8_t zone, bool open) {
@@ -94,14 +102,23 @@ custom_component:
         case 1: id(za1).publish_state(open); break;
         case 2: id(za2).publish_state(open); break;
         case 3: id(za3).publish_state(open); break;
-        case 4: id(za4).publish_state(open); break;
         case 5: id(za5).publish_state(open); break;
         case 6: id(za6).publish_state(open); break;
         case 7: id(za7).publish_state(open); break;
         case 8: id(za8).publish_state(open); break;
-        case 9: id(za9).publish_state(open); break;
-        case 10: id(za10).publish_state(open); break;
-        case 11: id(za11).publish_state(open); break;
+        case 17: id(za17).publish_state(open); break;
+        case 41: id(za41).publish_state(open); break;
+        case 42: id(za42).publish_state(open); break;
+        case 43: id(za43).publish_state(open); break;
+        case 44: id(za44).publish_state(open); break;
+        case 45: id(za45).publish_state(open); break;
+        case 46: id(za46).publish_state(open); break;
+        case 49: id(za49).publish_state(open); break;
+        case 50: id(za50).publish_state(open); break;
+        case 51: id(za51).publish_state(open); break;
+        case 52: id(za52).publish_state(open); break;
+        case 53: id(za53).publish_state(open); break;
+        case 54: id(za54).publish_state(open); break;
       }
     });
     return {DSCkeybus};
@@ -110,95 +127,167 @@ binary_sensor:
     #zone status
   - platform: template
     id: z1
-    name: "$systemName Front door"
-    device_class: door
+    name: "$systemName PIR Pasillo"
+    device_class: motion
   - platform: template
     id: z2
-    name: "$systemName Garage door"
-    device_class: door
+    name: "$systemName Tamper PIR Pasillo"
+    device_class: problem
   - platform: template
     id: z3
-    name: "$systemName Back door"
-    device_class: door
-  - platform: template
-    id: z4
-    name: "$systemName Living room window"
-    device_class: window
+    name: "$systemName Tamper Sirenas"
+    device_class: problem
   - platform: template
     id: z5
-    name: "$systemName Dining room window"
-    device_class: window
+    name: "$systemName Sensor Living"
+    device_class: motion
   - platform: template
     id: z6
-    name: "$systemName Family room window LF"
-    device_class: window
+    name: "$systemName Sensor Comedor"
+    device_class: motion
   - platform: template
     id: z7
-    name: "$systemName Family room window RF"
-    device_class: window
+    name: "$systemName Sensor Cocina"
+    device_class: motion
   - platform: template
     id: z8
-    name: "$systemName Basement windows"
+    name: "$systemName Sensor Baño"
+    device_class: motion
+  - platform: template
+    id: z17
+    name: "$systemName Zona X"
+    device_class: safety
+  - platform: template
+    id: z41
+    name: "$systemName Puerta Principal"
+    device_class: door
+  - platform: template
+    id: z42
+    name: "$systemName Ventana Principal"
     device_class: window
   - platform: template
-    id: z9
-    name: "$systemName Upstairs motion"
+    id: z43
+    name: "$systemName Persiana Principal"
+    device_class: window
+  - platform: template
+    id: z44
+    name: "$systemName Puerta Garage Frente"
+    device_class: garage_door
+  - platform: template
+    id: z45
+    name: "$systemName Puerta Garage Atras"
+    device_class: garage_door
+  - platform: template
+    id: z46
+    name: "$systemName Puerta Cocina"
+    device_class: door
+  - platform: template
+    id: z49
+    name: "$systemName PIR Patio"
     device_class: motion
   - platform: template
-    id: z10
-    name: "$systemName Basement motion"
-    device_class: motion
+    id: z50
+    name: "$systemName Tamper PIR Patio"
+    device_class: problem
   - platform: template
-    id: z11
-    name: "$systemName Main floor motion"
-    device_class: motion
-    
+    id: z51
+    name: "$systemName Ventana Dormitorio Principal"
+    device_class: window
+  - platform: template
+    id: z52
+    name: "$systemName Persiana Dormitorio Principal"
+    device_class: window
+  - platform: template
+    id: z53
+    name: "$systemName Ventana Dormitorio Niños"
+    device_class: window
+  - platform: template
+    id: z54
+    name: "$systemName Persiana Dormitorio Niños"
+    device_class: window
+
     #zone alarm status
   - platform: template
     id: za1
-    name: "$systemName Front door alarm"
+    name: "$systemName PIR Pasillo alarm"
     #device_class: safety
   - platform: template
     id: za2
-    name: "$systemName Garage door alarm"
+    name: "$systemName Tamper PIR pasillo alarm"
     #device_class: safety
   - platform: template
     id: za3
-    name: "$systemName Back door alarm"
-    #device_class: safety
-  - platform: template
-    id: za4
-    name: "$systemName Living room window alarm"
+    name: "$systemName Tamper Sirenas alarm"
     #device_class: safety
   - platform: template
     id: za5
-    name: "$systemName Dining room window alarm"
+    name: "$systemName Sensor Living alarm"
     #device_class: safety
   - platform: template
     id: za6
-    name: "$systemName Family room window LF alarm"
+    name: "$systemName Sensor Comedor alarm"
     #device_class: safety
   - platform: template
     id: za7
-    name: "$systemName Family room window RF alarm"
+    name: "$systemName Sensor Cocina alarm"
     #device_class: safety
   - platform: template
     id: za8
-    name: "$systemName Basement windows alarm"
+    name: "$systemName Sensor Baño alarm"
     #device_class: safety
   - platform: template
-    id: za9
-    name: "$systemName Upstairs motion alarm"
+    id: za17
+    name: "$systemName Zona X alarm"
     #device_class: safety
   - platform: template
-    id: za10
-    name: "$systemName Basement motion alarm"
+    id: za41
+    name: "$systemName Puerta Principal alarm"
     #device_class: safety
   - platform: template
-    id: za11
-    name: "$systemName Main floor motion alarm"
+    id: za42
+    name: "$systemName Ventana Principal alarm"
     #device_class: safety
-    
+  - platform: template
+    id: za43
+    name: "$systemName Persiana Principal alarm"
+    #device_class: safety
+  - platform: template
+    id: za44
+    name: "$systemName Puerta Garage Frente alarm"
+    #device_class: safety
+  - platform: template
+    id: za45
+    name: "$systemName Puerta Garage Atras alarm"
+    #device_class: safety
+  - platform: template
+    id: za46
+    name: "$systemName Puerta Cocina alarm"
+    #device_class: safety
+  - platform: template
+    id: za49
+    name: "$systemName PIR Patio alarm"
+    #device_class: safety
+  - platform: template
+    id: za50
+    name: "$systemName Tamper PIR Patio alarm"
+    #device_class: safety
+  - platform: template
+    id: za51
+    name: "$systemName Ventana Dormitorio Principal alarm"
+    #device_class: safety
+  - platform: template
+    id: za52
+    name: "$systemName Persiana Dormitorio Principal alarm"
+    #device_class: safety
+  - platform: template
+    id: za53
+    name: "$systemName Ventana Dormitorio Niños alarm"
+    #device_class: safety
+  - platform: template
+    id: za54
+    name: "$systemName Persiana Dormitorio Niños alarm"
+    #device_class: safety
+
   - platform: template
     id: tr
     name: "$systemName Trouble Status"
@@ -233,18 +322,10 @@ text_sensor:
     name: "$systemName Partition 1 Status "
     icon: "mdi:shield"
   - platform: template
-    id: p2
-    name: "$systemName Partition 2 Status "
-    icon: "mdi:shield"  
-  - platform: template
     id: m1
     name: "$systemName Partition 1 Msg "
     icon: "mdi:alert-box"
-  - platform: template
-    id: m2
-    name: "$systemName Partition 2 Msg "
-    icon: "mdi:alert-box"
-     
+
 switch:
   - platform: template
     name: "$systemName Connection"
