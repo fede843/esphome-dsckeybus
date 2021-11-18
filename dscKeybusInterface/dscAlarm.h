@@ -43,7 +43,7 @@ class DSCkeybushome : public PollingComponent, public CustomAPIDevice {
   const std::string STATUS_OFFLINE = "offline";
   const std::string STATUS_TRIGGERED = "triggered";
   const std::string STATUS_READY = "ready";
-  const std::string STATUS_NOT_READY = "unavailable"; //ha alarm panel likes to see "unavailable" instead of not_ready when the system can't be armed
+  const std::string STATUS_NOT_READY = "disarmed"; // instead unavailable --> ha alarm panel likes to see "unavailable" instead of not_ready when the system can't be armed
   const std::string MSG_ZONE_BYPASS = "zone_bypass_entered";
   const std::string MSG_ARMED_BYPASS = "armed_custom_bypass";
   const std::string MSG_NO_ENTRY_DELAY = "no_entry_delay";
