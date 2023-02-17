@@ -35,7 +35,7 @@ ota:
    
 status_led:
   pin:
-    number: D4
+    number: D7
     inverted: yes
 
 custom_component:
