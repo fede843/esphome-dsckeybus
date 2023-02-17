@@ -28,7 +28,7 @@ using namespace esphome;
 
 #endif
 
-#define maxZonesDefault 32 //set to 64 if your system supports it
+#define maxZonesDefault 64 //set to 64 if your system supports it
 
 dscKeybusInterface dsc(dscClockPinDefault, dscReadPinDefault, dscWritePinDefault);
 

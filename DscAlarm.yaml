@@ -25,23 +25,23 @@ substitutions:
   expanderAddr2: "0" # 2nd expander emulator address to use . Set to 0 to disable.
 
   #ESP32 Pins
-  dscClockPin: "22"
-  dscReadPin: "21"
-  dscWritePin: "18"
+#  dscClockPin: "22"
+#  dscReadPin: "21"
+#  dscWritePin: "18"
 
   #ESP8266 Pins
-  #dscClockPin: "5"
-  #dscReadPin: "4"
-  #dscWritePin: "15"
+  dscClockPin: "5"
+  dscReadPin: "4"
+  dscWritePin: "15"
 
-  maxZones: "32" # maximum amount of zones your system supports
+  maxZones: "64" # maximum amount of zones your system supports
 
 esphome:
   name: $systemName
-  platform: ESP32
-  board: nodemcu-32s
-  #platform: ESP8266
-  #board: nodemcuv2
+#  platform: ESP32
+#  board: nodemcu-32s
+  platform: ESP8266
+  board: nodemcuv2
 
   includes:
     # subdirectory path where custom component *.h and *.cpp files are located
@@ -104,15 +104,15 @@ ota:
 
 status_led:
   pin:
-#    number: D7
-#    inverted: yes
-    number: GPIO2
-    inverted: no
+    number: D7
+    inverted: yes
+#    number: GPIO2
+#    inverted: no
 
 #comment if using ESP8266 to conserve memory
-time:
- - platform: sntp
-   id: sntp_time
+#time:
+# - platform: sntp
+#   id: sntp_time
 
 custom_component:
  - id: dsckeybus
@@ -438,11 +438,6 @@ binary_sensor:
 #    name: "$systemName Persiana Dormitorio Niños alarm"
 #    #device_class: safety
 #
-    #zone alarm status
-  - platform: template
-    id: za1
-    name: "$systemName Front door alarm"
-    #device_class: safety
   - platform: template
     id: rdy
     name: "$systemName Partition 1 Ready"
