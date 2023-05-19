@@ -2,7 +2,7 @@
 substitutions:
   # change the name to suit your needs. This is what esphome will use as the friendly name for your component.
   # also used as a prefix for all fields
-  systemName: "dsc"
+  systemName: "dscalarm"
 
   #you can enter a list of user codes mapped to their names for display in armed/disarmed event messages
   userCodes: "1:John,2:Sally,3:Bob"
