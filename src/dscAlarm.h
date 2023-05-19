@@ -425,7 +425,7 @@ void begin() {
     register_service( & DSCkeybushome::alarm_disarm, "alarm_disarm", {
       "code"
     });
-#ifdef ESP32
+#if defined(ESP32) && !defined(ARDUINO_MQTT)
     register_service( & DSCkeybushome::set_panel_time, "set_panel_time", {});
 #else
     register_service( & DSCkeybushome::set_panel_time, "set_panel_time", {
@@ -454,8 +454,6 @@ void begin() {
       "partition"
     });
 #endif
-
-
 
 
     firstrun = true;
@@ -490,6 +488,8 @@ void begin() {
         partitionStatus[p].editIdx=0;
         partitionStatus[p].digits=0;
     }
+    for (int x=0;x<dscZones;x++)
+        programZones[x]=0;
 
     system1 = 0;
     system0 = 0;
@@ -591,6 +591,9 @@ private:
       String tpl=F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       if (dsc.status[partition - 1] == 0xAA) { //time entry
         tpl = F("XXXX    XXXXXX  XXXXXXXXXXXXXXXX");
+      }
+      if (dsc.status[partition - 1] == 0xAB) { //time entry
+        tpl = F("XXXX                            ");
       }
 
       if (key == '#') {
@@ -847,7 +850,7 @@ private:
         dsc.write(key, partition);
       }
       setStatus(partition - 1, true);
-    } else {
+    }  else  {
       dsc.write(key, partition);
       setStatus(partition - 1, false);
     }
@@ -945,7 +948,7 @@ public:
     if (code.length() != 4 || !isInt(code, 10)) code = ""; // ensure we get a numeric 4 digit code
     const char * alarmCode = strcpy(new char[code.length() + 1], code.c_str());
     if (!partition) partition = defaultPartition;
-ESP_LOGD("test","code=%s,alarmCode=%s",code.c_str(),alarmCode);
+
 #if !defined(ARDUINO_MQTT)  
     ESP_LOGD("debug","Setting Alarm state: %s to partition %d",state.c_str(),partition);
 #else
@@ -1017,7 +1020,7 @@ private:
         ESP_LOGI(label, "%02X: %s", cmd, s);
     #else
     if (debug > 0)
-        Serial.printf("%02X: %s\n", cmd, s);
+        Serial.printf("%s %02X: %s\n",label, cmd, s);
     #endif
   }
 
@@ -1094,6 +1097,8 @@ private:
         }
       }
     }
+    ESP_LOGD("info"," in get options %s",options.c_str());
+    //Serial.printf("in get options %s\n",options.c_str());
     return options.c_str();
   }
 
@@ -1338,7 +1343,6 @@ private:
         }
       }
     }
-    setStatus(partition, true);
   }
 #if defined(ARDUINO_MQTT)
   public:
@@ -1428,6 +1432,7 @@ void update() override {
       for (byte partition = 0; partition < dscPartitions; partition++) {
         if (dsc.disabled[partition] || dsc.status[partition] != 0xA0) continue;
         getBypassZones(partition);
+        setStatus(partition, true);
       }
 
     }
@@ -1444,7 +1449,7 @@ void update() override {
           partitionStatus[partition].chime=0;
         }
         if (dsc.disabled[partition]) continue;
-        setStatus(partition, forceRefresh);
+        setStatus(partition, forceRefresh || dsc.status[partition]==0xEE || dsc.status[partition]==0xA0);
 
       }
 #if !defined(ARDUINO_MQTT)
@@ -1499,15 +1504,15 @@ void update() override {
 
             if ( troubleFetch && !dsc.disabled[defaultPartition-1] && !partitionStatus[defaultPartition-1].locked) {
                 partitionStatus[defaultPartition-1].keyPressTime = millis();
-                dsc.write("*21#7##", defaultPartition); //fetch panel troubles /zone module low battery
-            }
-
+               // dsc.write("*21#7##", defaultPartition); //fetch panel troubles /zone module low battery
+            }          
+         
         } else {
             panelStatusChangeCallback(trStatus, false, 0); // Trouble alarm restored
             if (!dsc.disabled[defaultPartition-1] && !partitionStatus[defaultPartition-1].locked && troubleFetch) {
                 partitionStatus[defaultPartition-1].keyPressTime = millis();
-                dsc.write("*21#7##", defaultPartition); //fetch panel troubles /zone module low battery
-            }
+                //dsc.write("*21#7##", defaultPartition); //fetch panel troubles /zone module low battery
+            }             
         }
 
       }
@@ -1987,6 +1992,10 @@ void update() override {
       lcdLine1 = F("Keypad       ");
       lcdLine2 = F("blanked         ");
       break;
+    case 0x80:
+      lcdLine1 = F("Invalid entry   ");
+      lcdLine2 = F("         ");
+      break;
     case 0x8A:
       lcdLine1 = F("Activate     ");
       lcdLine2 = F("stay/away zones ");
@@ -2059,8 +2068,9 @@ void update() override {
       partitionStatus[partition].digits = 16;
       break;
     case 0xAB:
-      lcdLine1 = F("*6:          ");
-      lcdLine2 = F("Auto-arm time   ");
+      lcdLine1 = F(" HHMM");
+      lcdLine2 = F("");
+      partitionStatus[partition].digits = 4;
       break;
     case 0xAC:
       lcdLine1 = F("*6:          ");
@@ -2078,19 +2088,22 @@ void update() override {
       lcdLine1 = F("*6:          ");
       lcdLine2 = F("Enable DLS      ");
       break;
+    case 0xB1:
+        lcdLine1 = F("*6    ");
+        lcdLine2=F("b1 command");
+        break;
     case 0xB2:
+    case 0xB3:
       lcdLine1 = F("*7:          ");
       lcdLine2 = F("Command output  ");
       break;
     case 0xB7:
       lcdLine1 = F("Enter        ");
-
       lcdLine2 = F("installer code  ");
       break;
     case 0xB8:
       lcdLine1 = F("Enter *      ");
       lcdLine2 = F("function code   ");
-
       break;
     case 0xB9:
       lcdLine1 = F("Zone Tamper <>");
@@ -2105,6 +2118,10 @@ void update() override {
       lcdLine2 = F("6-digit code    ");
       partitionStatus[partition].digits = 6;
       break;
+    case 0xBF:
+      lcdLine1 = F("Select day:");
+      lcdLine2 = F("Sun=1,Tue=2,Sat=7");
+      break;
     case 0xC6:
       lcdLine1 = F(" Zone faults  <>");
       lcdLine2 = F(" ");
@@ -2117,6 +2134,10 @@ void update() override {
       lcdLine1 = F("Service req.  <>");
       lcdLine2 = F(" ");
       break;
+    case 0xCD:
+       lcdLine1 = F("Downloading in progress");
+       lcdLine2=F(" ");
+       break;
     case 0xCE:
       lcdLine1 = F("Active camera");
       lcdLine2 = F("monitor select. ");
@@ -2314,6 +2335,9 @@ void update() override {
 
           if (dsc.status[partition] == 0xAA) {
             tpl = F("XXXX    XXXXXX  XXXXXXXXXXXXXXXX");
+          }
+          if (dsc.status[partition] == 0xAB) {
+            tpl = F("XXXX");
           }
           if (tpl[x] == 'X') {
             if (x == partitionStatus[partition].editIdx)
@@ -2676,17 +2700,24 @@ void update() override {
     byte zoneStart = 0;
     byte zone;
   //  std::string group1msg,group2msg;
+    
 
-  //  group1msg="";
- //   group2msg="";
     if (startByte == 5) zoneStart = 4;
     for (byte zoneGroup = zoneStart; zoneGroup < zoneStart + 4; zoneGroup++) {
       programZones[zoneGroup] = dsc.panelData[startByte + byteCount];
       byteCount++;
     }
-
+    if (zoneStart==0) {
+        //clear upper group
+        for (int x=4;x<dscZones;x++) {
+            programZones[x] = 0;
+        }
+    }
+/*
     byteCount = 0;
     char s1[5];
+   std::string  group1msg="";
+   std::string  group2msg="";
     //if (startByte == 4 || startByte == 3) group1msg = "";
    // if (startByte == 5) group2msg = "";
     for (byte zoneGroup = zoneStart; zoneGroup < zoneStart + 4; zoneGroup++) {
@@ -2694,16 +2725,17 @@ void update() override {
         zone = (zoneBit + 1) + (zoneGroup * 8);
         if (bitRead(dsc.panelData[startByte + byteCount], zoneBit)) {
           sprintf(s1, "%02d ", zone);
-       //   if (startByte == 4 || startByte == 3) group1msg.append(s1);
-       //   if (startByte == 5) group2msg.append(s1);
+          if (startByte == 4 || startByte == 3) group1msg.append(s1);
+          if (startByte == 5) group2msg.append(s1);
 
         }
       }
       byteCount++;
     }
    // group1msg.append(group2msg);
-   // ESP_LOGD("info","procesprogramzones: %02X, %s",startByte,group1msg.c_str());
+    ESP_LOGD("info","procesprogramzones: %02X, %s,%S",startByte,group1msg.c_str(),group2msg.c_str());
     //lightsCallback(group1msg, defaultPartition);
+    */
     if (options)
       dsc.statusChanged = true;
   }
