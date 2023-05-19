@@ -1,3 +1,17 @@
+# Como hacer el update por cable
+
+Conectar la placa via usb, arrancar el container descomentando la parte del dev/usb, privileged, etc.
+Ir al navegador y seleccionar la opción "Plug into the computer running ESPHome Dashboard", selecionar el usb y listo.
+
+Lo mismo para los logs.
+
+# Como hacer el update por aire
+
+Estando el dispositivo conectado via WiFi, entrar a home assistant, ir a devices, seleccionar dscalarm y darle a desconectar.
+Una vez desconectados vamos a la pagina de ESPHome, damos instalar, wireless y listo.
+
+Lo mismo para los logs.
+
 # DSCKeyBus ESPHOME custom component to interface to a DSC POWERSERIES alarm system.
 
 This is an implementation of an ESPHOME custom component to interface directly to a DSC POWERSERIES alarm system using the keybus interface and  very inexpensive ESP8266/ESP32 modules . NOTE: I strongly suggest using an ESP32 for it's increased capabilities. 
