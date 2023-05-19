@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  esphome:
+    container_name: esphome
+    image: esphome/esphome
+    volumes:
+      - /home/neo/Proyectos/esphome-dsckeybus:/config
+#      - /home/neo/docker/volumes/esphome:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/hosts:/etc/hosts:ro #some local definitions, like dscalarm
+    restart: unless-stopped
+# Solo cuando lo enchufo
+#    devices:
+#      - /dev/ttyUSB0:/dev/ttyUSB0
+#    privileged: true
+#    network_mode: host
+    ports:
+      - 6052:6052
+
+networks:
+  mainnet:
+    external: true
