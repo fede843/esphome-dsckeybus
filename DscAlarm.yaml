@@ -43,9 +43,9 @@ esphome:
   platform: ESP8266
   board: nodemcuv2
 
-#  includes:
-#    # subdirectory path where custom component *.h and *.cpp files are located
-#    - dscKeybusInterface/
+  includes:
+    # subdirectory path where custom component *.h and *.cpp files are located
+    - src/
 
  #ESP32 only .  Calls a public function within the custom component above. In this case syncs the time
  # to the panel 30 seconds after startup
